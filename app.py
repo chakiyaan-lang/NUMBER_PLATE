@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import gradio as gr 
 
 
-model = YOLO("best (1).pt")
+model = YOLO("best.pt")
 
 def pred_image(image):
     img = model.predict(image)
