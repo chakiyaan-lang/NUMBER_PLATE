@@ -1,22 +1,48 @@
 import os
 
-# Set YOLO config path first
+# YOLO config directory fix
 os.environ["YOLO_CONFIG_DIR"] = "/tmp/Ultralytics"
 
-import gradio as gr
+from PIL import Image
+import streamlit as st
 from ultralytics import YOLO
 
-# Load model
-model = YOLO("best.pt")
+# Streamlit Page Title
+st.title("Number Plate Detection App")
+st.write("Image upload karein aur YOLO model number plate detect kar ke dega.")
 
-def pred_image(image):
-    img = model.predict(image)
-    return img[0].plot()
 
-# Create Gradio Interface
-app = gr.Interface(fn=pred_image, inputs="image", outputs="image")
+# Model Load Karein
+@st.cache_resource
+def load_model():
+    return YOLO("best.pt")
 
-# Launch App
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.launch(server_name="0.0.0.0", server_port=port,share=True)
+
+model = load_model()
+
+# Image Upload Widget
+uploaded_file = st.file_uploader(
+    "Koi image select karein...", type=["jpg", "jpeg", "png"]
+)
+
+if uploaded_file is not None:
+    # Image Display
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded Image", use_container_width=True)
+
+    if st.button("Detect Number Plate"):
+        with st.spinner("Processing..."):
+            # Prediction
+            results = model.predict(image)
+
+            # Bounding box wali image hasil karein
+            res_plotted = results[0].plot()
+
+            # OpenCV format (BGR) ko RGB mein convert karein
+            res_image = res_plotted[:, :, ::-1]
+
+            # Result Show Karein
+            st.success("Detection Complete!")
+            st.image(
+                res_image, caption="Detected Result", use_container_width=True
+            )
