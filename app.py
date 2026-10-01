@@ -1,21 +1,24 @@
+import os
+
+# Set YOLO config path first
+os.environ["YOLO_CONFIG_DIR"] = "/tmp/Ultralytics"
+
+import gradio as gr
 from ultralytics import YOLO
-import gradio as gr 
 
-
+# Load model
 model = YOLO("best.pt")
+
 
 def pred_image(image):
     img = model.predict(image)
     return img[0].plot()
 
 
-app= gr.Interface(fn = pred_image, inputs = 'image', outputs = "image" ),share=True,
-app.launch()
-app.launch(
-    server_name="0.0.0.0",
-    server_port=int(__import__("os").environ.get("PORT", 10000)))
-import os
-os.environ["YOLO_CONFIG_DIR"] = "/tmp/Ultralytics"
+# Create Gradio Interface
+app = gr.Interface(fn=pred_image, inputs="image", outputs="image")
 
-from ultralytics import YOLO
-# Baki aapka code...
+# Launch App
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.launch(server_name="0.0.0.0", server_port=port, share=True)
