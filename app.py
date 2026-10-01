@@ -9,7 +9,7 @@ def pred_image(image):
     return img[0].plot()
 
 
-app= gr.Interface(fn = pred_image, inputs = 'image', outputs = "image" )
+app= gr.Interface(fn = pred_image, inputs = 'image', outputs = "image" ),share=True,
 app.launch()
 app.launch(
     server_name="0.0.0.0",
